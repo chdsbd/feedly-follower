@@ -6,6 +6,19 @@
     <script type="module" src="popup.js"></script>
 </head>
 <body>
-    <strong>Hello World!</strong>
+    <h1>Feedly Follower</h1>
+
+    <div id="status">
+        <p id="statusText">Loading...</p>
+        <p id="subscriptionCount"></p>
+    </div>
+
+    <div id="tokenSection">
+        <label for="tokenInput">Feedly Token:</label>
+        <textarea id="tokenInput" placeholder="Paste your Bearer token here"></textarea>
+        <button id="saveToken">Save Token</button>
+    </div>
+
+    <button id="refreshBtn">Refresh Subscriptions</button>
 </body>
 </html>

@@ -4,7 +4,7 @@
 const FEEDLY_API_URL = 'https://api.feedly.com/v3/collections?withStats=true&ct=feedly.desktop&cv=31.0.2930';
 const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes
 
-let subscriptionDomains = new Map(); // domain -> { feedTitle, collectionLabel }
+let subscriptionDomains = new Map(); // domain -> { feedTitle, collectionLabel, feedId }
 let lastFetchTime = 0;
 
 // Extract domain from URL
@@ -78,7 +78,8 @@ async function fetchCollections() {
                     if (domain) {
                         subscriptionDomains.set(domain, {
                             feedTitle: feed.title || 'Unknown Feed',
-                            collectionLabel: collectionLabel
+                            collectionLabel: collectionLabel,
+                            feedId: feed.id
                         });
                     }
                 }
@@ -99,6 +100,18 @@ async function fetchCollections() {
 async function ensureFreshData() {
     if (Date.now() - lastFetchTime > CACHE_DURATION_MS) {
         await fetchCollections();
+    }
+}
+
+// Update popup state based on whether token is configured
+async function updatePopupState() {
+    const { feedlyToken } = await browser.storage.local.get('feedlyToken');
+    if (feedlyToken) {
+        // Disable popup so onClicked fires
+        await browser.action.setPopup({ popup: '' });
+    } else {
+        // Enable popup for token configuration
+        await browser.action.setPopup({ popup: 'popup.html' });
     }
 }
 
@@ -153,6 +166,27 @@ async function updateIconForTab(tabId, url) {
     }
 }
 
+// Handle toolbar icon click (only fires when popup is disabled)
+browser.action.onClicked.addListener(async (tab) => {
+    await ensureFreshData();
+    const subscription = findSubscription(tab.url);
+    const domain = extractDomain(tab.url);
+
+    if (subscription) {
+        // Open the feed in Feedly
+        const encodedFeedId = encodeURIComponent(subscription.feedId);
+        await browser.tabs.create({
+            url: `https://feedly.com/i/subscription/${encodedFeedId}`
+        });
+    } else if (domain) {
+        // Open discover page for this domain
+        const encodedDomain = encodeURIComponent(`suggesto/https://${domain}`);
+        await browser.tabs.create({
+            url: `https://feedly.com/i/discover?query=${encodedDomain}`
+        });
+    }
+});
+
 // Listen for tab updates
 browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (changeInfo.url || changeInfo.status === 'complete') {
@@ -174,6 +208,7 @@ browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
         browser.storage.local.set({ feedlyToken: request.token }).then(() => {
             lastFetchTime = 0; // Force refresh
             fetchCollections().then(success => {
+                updatePopupState();
                 return { success, count: subscriptionDomains.size };
             });
         });
@@ -198,4 +233,6 @@ browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 // Initial load
-fetchCollections();
+fetchCollections().then(() => {
+    updatePopupState();
+});

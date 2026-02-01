@@ -1,9 +1,8 @@
 async function init() {
     const statusText = document.getElementById('statusText');
     const subscriptionCount = document.getElementById('subscriptionCount');
-    const tokenInput = document.getElementById('tokenInput');
-    const saveTokenBtn = document.getElementById('saveToken');
     const refreshBtn = document.getElementById('refreshBtn');
+    const settingsBtn = document.getElementById('settingsBtn');
     const siteStatusText = document.getElementById('siteStatusText');
     const actionBtn = document.getElementById('actionBtn');
 
@@ -33,7 +32,7 @@ async function init() {
                 currentSubscription = null;
                 siteStatusText.textContent = currentDomain ? `Not subscribed to ${currentDomain}` : 'No site to check';
                 siteStatusText.className = '';
-                actionBtn.textContent = 'Subscribe';
+                actionBtn.textContent = 'Subscribe on Feedly';
                 actionBtn.className = 'subscribe-btn';
             }
             actionBtn.style.display = currentDomain ? 'block' : 'none';
@@ -76,7 +75,7 @@ async function init() {
             } else {
                 statusText.textContent = 'Not configured';
                 statusText.className = 'disconnected';
-                subscriptionCount.textContent = 'Enter your Feedly token below';
+                subscriptionCount.textContent = 'Configure token in Settings';
             }
         } catch (error) {
             statusText.textContent = 'Error';
@@ -84,35 +83,9 @@ async function init() {
         }
     }
 
-    // Load saved token
-    const { feedlyToken } = await browser.storage.local.get('feedlyToken');
-    if (feedlyToken) {
-        tokenInput.value = feedlyToken.substring(0, 20) + '...';
-    }
-
-    // Save token handler
-    saveTokenBtn.addEventListener('click', async () => {
-        const token = tokenInput.value.trim();
-        if (!token || token.endsWith('...')) {
-            alert('Please enter a valid token');
-            return;
-        }
-
-        saveTokenBtn.textContent = 'Saving...';
-        saveTokenBtn.disabled = true;
-
-        try {
-            await browser.storage.local.set({ feedlyToken: token });
-            await browser.runtime.sendMessage({ action: 'refresh' });
-            tokenInput.value = token.substring(0, 20) + '...';
-            await updateStatus();
-            await checkCurrentTab();
-        } catch (error) {
-            alert('Error saving token: ' + error.message);
-        } finally {
-            saveTokenBtn.textContent = 'Save Token';
-            saveTokenBtn.disabled = false;
-        }
+    // Settings button handler
+    settingsBtn.addEventListener('click', () => {
+        browser.runtime.openOptionsPage();
     });
 
     // Refresh handler
@@ -132,7 +105,7 @@ async function init() {
         } catch (error) {
             alert('Error refreshing: ' + error.message);
         } finally {
-            refreshBtn.textContent = 'Refresh Subscriptions';
+            refreshBtn.textContent = 'Refresh';
             refreshBtn.disabled = false;
         }
     });

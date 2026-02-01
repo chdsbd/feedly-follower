@@ -26,6 +26,11 @@
 
     "permissions": [ "tabs", "storage" ],
 
+    "options_ui": {
+        "page": "settings.html",
+        "open_in_tab": true
+    },
+
     "host_permissions": [
         "https://api.feedly.com/*"
     ]

@@ -117,6 +117,8 @@
 				Resources/popup.css,
 				Resources/popup.html,
 				Resources/popup.js,
+				Resources/settings.html,
+				Resources/settings.js,
 				SafariWebExtensionHandler.swift,
 			);
 			target = DF3EA9092F28FE1F005353EB /* feedly-follower Extension (iOS) */;
@@ -132,6 +134,8 @@
 				Resources/popup.css,
 				Resources/popup.html,
 				Resources/popup.js,
+				Resources/settings.html,
+				Resources/settings.js,
 				SafariWebExtensionHandler.swift,
 			);
 			target = DF3EA9132F28FE1F005353EB /* feedly-follower Extension (macOS) */;

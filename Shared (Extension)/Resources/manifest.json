@@ -20,7 +20,8 @@
     },
 
     "action": {
-        "default_icon": "images/plus.circle.svg"
+        "default_icon": "images/plus.circle.svg",
+        "default_popup": "popup.html"
     },
 
     "permissions": [ "tabs", "storage" ],

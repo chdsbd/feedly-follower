@@ -4,6 +4,63 @@ async function init() {
     const tokenInput = document.getElementById('tokenInput');
     const saveTokenBtn = document.getElementById('saveToken');
     const refreshBtn = document.getElementById('refreshBtn');
+    const siteStatusText = document.getElementById('siteStatusText');
+    const actionBtn = document.getElementById('actionBtn');
+
+    let currentSubscription = null;
+    let currentDomain = null;
+
+    // Check current tab's subscription status
+    async function checkCurrentTab() {
+        try {
+            const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
+            if (!tab || !tab.url || tab.url.startsWith('about:') || tab.url.startsWith('chrome:') || tab.url.startsWith('safari:')) {
+                siteStatusText.textContent = 'No site to check';
+                actionBtn.style.display = 'none';
+                return;
+            }
+
+            const result = await browser.runtime.sendMessage({ action: 'checkSubscription', url: tab.url });
+            currentDomain = result.domain;
+
+            if (result.isSubscribed) {
+                currentSubscription = result.subscription;
+                siteStatusText.textContent = `Subscribed: ${result.subscription.feedTitle}`;
+                siteStatusText.className = 'connected';
+                actionBtn.textContent = 'View Subscription';
+                actionBtn.className = 'view-btn';
+            } else {
+                currentSubscription = null;
+                siteStatusText.textContent = currentDomain ? `Not subscribed to ${currentDomain}` : 'No site to check';
+                siteStatusText.className = '';
+                actionBtn.textContent = 'Subscribe';
+                actionBtn.className = 'subscribe-btn';
+            }
+            actionBtn.style.display = currentDomain ? 'block' : 'none';
+        } catch (error) {
+            siteStatusText.textContent = 'Error checking site';
+            siteStatusText.className = 'disconnected';
+            actionBtn.style.display = 'none';
+        }
+    }
+
+    // Handle action button click
+    actionBtn.addEventListener('click', async () => {
+        if (currentSubscription) {
+            // View existing subscription
+            const encodedFeedId = encodeURIComponent(currentSubscription.feedId);
+            await browser.tabs.create({
+                url: `https://feedly.com/i/subscription/${encodedFeedId}`
+            });
+        } else if (currentDomain) {
+            // Subscribe to new site
+            const encodedDomain = encodeURIComponent(`suggesto/https://${currentDomain}`);
+            await browser.tabs.create({
+                url: `https://feedly.com/i/discover?query=${encodedDomain}`
+            });
+        }
+        window.close();
+    });
 
     // Load current status
     async function updateStatus() {
@@ -49,6 +106,7 @@ async function init() {
             await browser.runtime.sendMessage({ action: 'refresh' });
             tokenInput.value = token.substring(0, 20) + '...';
             await updateStatus();
+            await checkCurrentTab();
         } catch (error) {
             alert('Error saving token: ' + error.message);
         } finally {
@@ -70,6 +128,7 @@ async function init() {
                 subscriptionCount.textContent = 'Failed to refresh';
             }
             await updateStatus();
+            await checkCurrentTab();
         } catch (error) {
             alert('Error refreshing: ' + error.message);
         } finally {
@@ -80,6 +139,7 @@ async function init() {
 
     // Initial status update
     await updateStatus();
+    await checkCurrentTab();
 }
 
 document.addEventListener('DOMContentLoaded', init);

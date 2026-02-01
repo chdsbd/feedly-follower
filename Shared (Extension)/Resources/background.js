@@ -103,17 +103,6 @@ async function ensureFreshData() {
     }
 }
 
-// Update popup state based on whether token is configured
-async function updatePopupState() {
-    const { feedlyToken } = await browser.storage.local.get('feedlyToken');
-    if (feedlyToken) {
-        // Disable popup so onClicked fires
-        await browser.action.setPopup({ popup: '' });
-    } else {
-        // Enable popup for token configuration
-        await browser.action.setPopup({ popup: 'popup.html' });
-    }
-}
 
 // Check if a URL matches any subscription
 function findSubscription(url) {
@@ -166,26 +155,6 @@ async function updateIconForTab(tabId, url) {
     }
 }
 
-// Handle toolbar icon click (only fires when popup is disabled)
-browser.action.onClicked.addListener(async (tab) => {
-    await ensureFreshData();
-    const subscription = findSubscription(tab.url);
-    const domain = extractDomain(tab.url);
-
-    if (subscription) {
-        // Open the feed in Feedly
-        const encodedFeedId = encodeURIComponent(subscription.feedId);
-        await browser.tabs.create({
-            url: `https://feedly.com/i/subscription/${encodedFeedId}`
-        });
-    } else if (domain) {
-        // Open discover page for this domain
-        const encodedDomain = encodeURIComponent(`suggesto/https://${domain}`);
-        await browser.tabs.create({
-            url: `https://feedly.com/i/discover?query=${encodedDomain}`
-        });
-    }
-});
 
 // Listen for tab updates
 browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
@@ -208,7 +177,6 @@ browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
         browser.storage.local.set({ feedlyToken: request.token }).then(() => {
             lastFetchTime = 0; // Force refresh
             fetchCollections().then(success => {
-                updatePopupState();
                 return { success, count: subscriptionDomains.size };
             });
         });
@@ -230,9 +198,19 @@ browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
             count: subscriptionDomains.size
         }));
     }
+
+    if (request.action === 'checkSubscription') {
+        return ensureFreshData().then(() => {
+            const subscription = findSubscription(request.url);
+            const domain = extractDomain(request.url);
+            return {
+                isSubscribed: !!subscription,
+                subscription: subscription,
+                domain: domain
+            };
+        });
+    }
 });
 
 // Initial load
-fetchCollections().then(() => {
-    updatePopupState();
-});
+fetchCollections();

@@ -16,6 +16,56 @@ h1 {
     text-align: center;
 }
 
+#siteStatus {
+    background: var(--status-bg, #f5f5f5);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+#siteStatusText {
+    margin: 0 0 8px 0;
+    font-weight: 500;
+    font-size: 12px;
+}
+
+#siteStatusText.connected {
+    color: #2BB24C;
+}
+
+#siteStatusText.disconnected {
+    color: #E53935;
+}
+
+#actionBtn {
+    margin-top: 8px;
+}
+
+#actionBtn.subscribe-btn {
+    background: #2BB24C;
+    color: white;
+}
+
+#actionBtn.subscribe-btn:hover {
+    background: #239B3F;
+}
+
+#actionBtn.view-btn {
+    background: #1A73E8;
+    color: white;
+}
+
+#actionBtn.view-btn:hover {
+    background: #1557B0;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid var(--border-color, #ddd);
+    margin: 12px 0;
+}
+
 #status {
     background: var(--status-bg, #f5f5f5);
     border-radius: 8px;

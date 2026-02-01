@@ -66,6 +66,7 @@
 			membershipExceptions = (
 				"/Localized: Resources/Main.html",
 				Assets.xcassets,
+				"Resources/feedly-follower.icon",
 				Resources/Icon.png,
 				Resources/Script.js,
 				Resources/Style.css,
@@ -92,6 +93,7 @@
 			membershipExceptions = (
 				"/Localized: Resources/Main.html",
 				Assets.xcassets,
+				"Resources/feedly-follower.icon",
 				Resources/Icon.png,
 				Resources/Script.js,
 				Resources/Style.css,

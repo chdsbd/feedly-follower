@@ -21,7 +21,6 @@ async function init() {
         tab.url.startsWith("safari:")
       ) {
         siteStatusText.textContent = "No site to check";
-        actionBtn.style.display = "none";
         return;
       }
 
@@ -30,36 +29,31 @@ async function init() {
         url: tab.url,
       });
 
-      if (currentSubscription.subscribed) {
-        siteStatusText.textContent = `Subscribed`;
-        siteStatusText.className = "connected";
+      if (currentSubscription?.subscribed) {
         actionBtn.textContent = "View Subscription";
         actionBtn.className = "view-btn";
       } else {
-        currentSubscription = null;
-        siteStatusText.textContent = "Subscribe";
-        siteStatusText.className = "";
         actionBtn.textContent = "Subscribe on Feedly";
         actionBtn.className = "subscribe-btn";
       }
-      actionBtn.style.display = currentSubscription.subscribed ? "block" : "none";
+      actionBtn.style.display = "block";
     } catch (error) {
-      siteStatusText.textContent = "Error checking site";
+      siteStatusText.textContent = `Error checking site ${error}`;
       siteStatusText.className = "disconnected";
-      actionBtn.style.display = "none";
       console.error(error)
     }
   }
 
   // Handle action button click
   actionBtn.addEventListener("click", async () => {
-    if (currentSubscription.subscriptionUrl) {
+    if (currentSubscription?.subscriptionUrl) {
       // View existing subscription
       await browser.tabs.create({
         url: currentSubscription.subscriptionUrl,
       });
     } else {
       // Subscribe to new site
+      const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
       const encodedDomain = encodeURIComponent(`suggesto/${tab.url}`);
       await browser.tabs.create({
         url: `https://feedly.com/i/discover?query=${encodedDomain}`,
@@ -69,9 +63,9 @@ async function init() {
   });
 
   // Settings button handler
-  settingsBtn.addEventListener("click", () => {
-    browser.runtime.openOptionsPage();
-  });
+  // settingsBtn.addEventListener("click", () => {
+  //   browser.runtime.openOptionsPage();
+  // });
 
 
   await checkCurrentTab();

@@ -16,7 +16,7 @@ async function fetchSubscription(url) {
 
   if (!response.ok) {
     console.error("API error:", response.status);
-    return false;
+    return {subscribed: false, error: true}
   }
   //
   return await response.json();
@@ -29,15 +29,17 @@ async function findSubscription(url) {
 
 // Update the extension icon for a tab
 async function updateIconForTab(tabId, url) {
+        await browser.action.setIcon({
+      tabId: tabId,
+      path: "images/checkmark.circle.svg",
+    });
+
   if (!url || url.startsWith("about:") || url.startsWith("chrome:") || url.startsWith("safari:")) {
     return;
   }
-
-  
-
   const subscription = await findSubscription(url);
 
-  if (subscription) {
+  if (subscription.subscribed) {
     await browser.action.setIcon({
       tabId: tabId,
       path: "images/checkmark.circle.green.svg",

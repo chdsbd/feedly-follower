@@ -112,15 +112,12 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Resources/_locales,
-				Resources/background.js,
 				Resources/content.js,
 				Resources/images,
 				Resources/manifest.json,
 				Resources/popup.css,
 				Resources/popup.html,
 				Resources/popup.js,
-				Resources/settings.html,
-				Resources/settings.js,
 				SafariWebExtensionHandler.swift,
 			);
 			target = DF3EA9092F28FE1F005353EB /* feedly-follower Extension (iOS) */;
@@ -129,15 +126,12 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Resources/_locales,
-				Resources/background.js,
 				Resources/content.js,
 				Resources/images,
 				Resources/manifest.json,
 				Resources/popup.css,
 				Resources/popup.html,
 				Resources/popup.js,
-				Resources/settings.html,
-				Resources/settings.js,
 				SafariWebExtensionHandler.swift,
 			);
 			target = DF3EA9132F28FE1F005353EB /* feedly-follower Extension (macOS) */;

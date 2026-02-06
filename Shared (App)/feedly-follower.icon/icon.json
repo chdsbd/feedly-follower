@@ -1,34 +1,32 @@
 {
-  "fill" : {
-    "automatic-gradient" : "display-p3:0.84612,0.96783,0.83372,1.00000"
+  "fill": {
+    "automatic-gradient": "display-p3:0.84612,0.96783,0.83372,1.00000"
   },
-  "groups" : [
+  "groups": [
     {
-      "layers" : [
+      "layers": [
         {
-          "image-name" : "Ellipse 2.svg",
-          "name" : "Ellipse 2"
+          "image-name": "Ellipse 2.svg",
+          "name": "Ellipse 2"
         },
         {
-          "fill" : "automatic",
-          "image-name" : "Ellipse 1.svg",
-          "name" : "Ellipse 1"
+          "fill": "automatic",
+          "image-name": "Ellipse 1.svg",
+          "name": "Ellipse 1"
         }
       ],
-      "shadow" : {
-        "kind" : "neutral",
-        "opacity" : 0.5
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.5
       },
-      "translucency" : {
-        "enabled" : true,
-        "value" : 0.5
+      "translucency": {
+        "enabled": true,
+        "value": 0.5
       }
     }
   ],
-  "supported-platforms" : {
-    "circles" : [
-      "watchOS"
-    ],
-    "squares" : "shared"
+  "supported-platforms": {
+    "circles": ["watchOS"],
+    "squares": "shared"
   }
 }

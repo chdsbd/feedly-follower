@@ -1,0 +1,14 @@
+{
+  "name": "feedly-follower",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "main": "test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "oxfmt": "^0.28.0"
+  }
+}

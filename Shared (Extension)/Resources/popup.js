@@ -1,15 +1,9 @@
 async function init() {
-  const statusText = document.getElementById("statusText");
-  const subscriptionCount = document.getElementById("subscriptionCount");
-  const refreshBtn = document.getElementById("refreshBtn");
-  const settingsBtn = document.getElementById("settingsBtn");
-  const siteStatusText = document.getElementById("siteStatusText");
+  const loading = document.getElementById("loading");
   const actionBtn = document.getElementById("actionBtn");
 
   let currentSubscription = null;
-  let currentDomain = null;
 
-  // Check current tab's subscription status
   async function checkCurrentTab() {
     try {
       const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
@@ -20,7 +14,7 @@ async function init() {
         tab.url.startsWith("chrome:") ||
         tab.url.startsWith("safari:")
       ) {
-        siteStatusText.textContent = "No site to check";
+        loading.textContent = "No site to check";
         return;
       }
 
@@ -28,6 +22,8 @@ async function init() {
         action: "checkSubscription",
         url: tab.url,
       });
+
+      loading.style.display = "none";
 
       if (currentSubscription?.subscribed) {
         actionBtn.textContent = "View Subscription";
@@ -38,21 +34,17 @@ async function init() {
       }
       actionBtn.style.display = "block";
     } catch (error) {
-      siteStatusText.textContent = `Error checking site ${error}`;
-      siteStatusText.className = "disconnected";
-      console.error(error)
+      loading.textContent = `Error: ${error.message}`;
+      console.error(error);
     }
   }
 
-  // Handle action button click
   actionBtn.addEventListener("click", async () => {
     if (currentSubscription?.subscriptionUrl) {
-      // View existing subscription
       await browser.tabs.create({
         url: currentSubscription.subscriptionUrl,
       });
     } else {
-      // Subscribe to new site
       const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
       const encodedDomain = encodeURIComponent(`suggesto/${tab.url}`);
       await browser.tabs.create({
@@ -61,12 +53,6 @@ async function init() {
     }
     window.close();
   });
-
-  // Settings button handler
-  // settingsBtn.addEventListener("click", () => {
-  //   browser.runtime.openOptionsPage();
-  // });
-
 
   await checkCurrentTab();
 }

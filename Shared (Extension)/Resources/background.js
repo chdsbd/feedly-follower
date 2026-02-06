@@ -18,69 +18,13 @@ async function fetchSubscription(url) {
     console.error("API error:", response.status);
     return {subscribed: false, error: true}
   }
-  //
+
   return await response.json();
 }
 
-// Check if a URL matches any subscription
-async function findSubscription(url) {
-  return await fetchSubscription(url);
-}
-
-// Update the extension icon for a tab
-async function updateIconForTab(tabId, url) {
-        await browser.action.setIcon({
-      tabId: tabId,
-      path: "images/checkmark.circle.svg",
-    });
-
-  if (!url || url.startsWith("about:") || url.startsWith("chrome:") || url.startsWith("safari:")) {
-    return;
-  }
-  const subscription = await findSubscription(url);
-
-  if (subscription.subscribed) {
-    await browser.action.setIcon({
-      tabId: tabId,
-      path: "images/checkmark.circle.green.svg",
-    });
-    await browser.action.setTitle({
-      tabId: tabId,
-      title: `Subscribed`,
-    });
-  } else {
-    await browser.action.setIcon({
-      tabId: tabId,
-      path: "images/plus.circle.svg",
-    });
-    await browser.action.setTitle({
-      tabId: tabId,
-      title: "Subscribe to this site",
-    });
-  }
-}
-
-// Listen for tab updates
-browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.url || changeInfo.status === "complete") {
-    updateIconForTab(tabId, tab.url);
-  }
-});
-
-// Listen for tab activation (switching tabs)
-browser.tabs.onActivated.addListener(async (activeInfo) => {
-  const tab = await browser.tabs.get(activeInfo.tabId);
-  if (tab.url) {
-    updateIconForTab(tab.id, tab.url);
-  }
-});
-
 // Handle messages from popup
 browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  
   if (request.action === "checkSubscription") {
-    
-      return findSubscription(request.url);
-    
+    return fetchSubscription(request.url);
   }
 });

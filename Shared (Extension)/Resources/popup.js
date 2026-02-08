@@ -15,7 +15,6 @@ async function fetchSubscription(url) {
 }
 
 async function init() {
-  const loading = document.getElementById("loading");
   const actionBtn = document.getElementById("actionBtn");
 
   let currentSubscription = null;
@@ -30,13 +29,13 @@ async function init() {
         tab.url.startsWith("chrome:") ||
         tab.url.startsWith("safari:")
       ) {
-        loading.textContent = "No site to check";
+        actionBtn.disabled = true
+        actionBtn.textContent = "No site to check";
         return;
       }
 
       currentSubscription = await fetchSubscription(tab.url);
-
-      loading.style.display = "none";
+      actionBtn.disabled = false
 
       if (currentSubscription?.subscribed) {
         actionBtn.textContent = "View Subscription";
@@ -45,9 +44,8 @@ async function init() {
         actionBtn.textContent = "Subscribe on Feedly";
         actionBtn.className = "subscribe-btn";
       }
-      actionBtn.style.display = "block";
     } catch (error) {
-      loading.textContent = `Error: ${error.message}`;
+      actionBtn.textContent = `Error: ${error.message}`;
       console.error(error);
     }
   }
@@ -67,6 +65,7 @@ async function init() {
     window.close();
   });
 
+  actionBtn.style.minWidth = `${actionBtn.offsetWidth}px`;
   await checkCurrentTab();
 }
 
